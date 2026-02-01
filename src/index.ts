@@ -17,15 +17,16 @@ app.get('/:path{.+}', async (c) => {
     return c.json({ error: 'Missing environment variables' }, 500);
   }
 
-  const url = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${path}`;
+  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`;
 
   try {
     const response = await fetch(url, {
       headers: {
-        Authorization: `token ${GITHUB_TOKEN}`,
+        Authorization: `Bearer ${GITHUB_TOKEN}`,
         Accept: 'application/vnd.github.v3.raw',
         'User-Agent': 'Vercel-Hono-Proxy',
       },
+      cache: 'no-store',
     });
 
     if (!response.ok) {
@@ -38,12 +39,11 @@ app.get('/:path{.+}', async (c) => {
       );
     }
 
-    // 转发原始内容及其 Content-Type
+    // // 转发原始内容及其 Content-Type
     const content = await response.arrayBuffer();
-    const contentType = response.headers.get('Content-Type') || 'text/plain';
 
     return c.body(content, 200, {
-      'Content-Type': contentType,
+      'Content-Type': 'text/plain',
       'Cache-Control': 'no-cache, no-store, must-revalidate',
     });
   } catch (error: any) {
