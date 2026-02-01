@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 
 export const runtime = 'edge';
 
-const app = new Hono().basePath('/api');
+const app = new Hono();
 
 app.get('/:path{.+}', async (c) => {
   const path = c.req.param('path');
