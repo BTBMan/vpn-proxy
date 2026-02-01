@@ -39,7 +39,7 @@ app.get('/:path{.+}', async (c) => {
       );
     }
 
-    // // 转发原始内容及其 Content-Type
+    // 转发原始内容及其 Content-Type
     const content = await response.arrayBuffer();
 
     return c.body(content, 200, {
